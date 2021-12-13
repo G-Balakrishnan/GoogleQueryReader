@@ -89,7 +89,7 @@ namespace GoogleQueryReader.Models
         public string OgImageWidth { get; set; }
 
         [JsonProperty("article:published_time")]
-        public DateTime ArticlePublishedTime { get; set; }
+        public string ArticlePublishedTime { get; set; }
 
         [JsonProperty("og:site_name")]
         public string OgSiteName { get; set; }
@@ -108,7 +108,7 @@ namespace GoogleQueryReader.Models
         public string TwitterSite { get; set; }
 
         [JsonProperty("article:modified_time")]
-        public DateTime ArticleModifiedTime { get; set; }
+        public string ArticleModifiedTime { get; set; }
         public string news_keywords { get; set; }
 
         [JsonProperty("og:type")]
@@ -174,7 +174,7 @@ namespace GoogleQueryReader.Models
         public string TwitterCreator { get; set; }
 
         [JsonProperty("publish-date")]
-        public DateTime? PublishDate { get; set; }
+        public string? PublishDate { get; set; }
 
         [JsonProperty("ahrefs-site-verification")]
         public string AhrefsSiteVerification { get; set; }
@@ -192,7 +192,7 @@ namespace GoogleQueryReader.Models
         public string FbPages { get; set; }
 
         [JsonProperty("created-date")]
-        public DateTime? CreatedDate { get; set; }
+        public string? CreatedDate { get; set; }
 
         [JsonProperty("article:author")]
         public string ArticleAuthor { get; set; }
@@ -207,7 +207,7 @@ namespace GoogleQueryReader.Models
         public string TwitterAppNameIpad { get; set; }
 
         [JsonProperty("modified-date")]
-        public DateTime? ModifiedDate { get; set; }
+        public string? ModifiedDate { get; set; }
         public string atdlayout { get; set; }
 
         [JsonProperty("google-play-app")]
@@ -245,7 +245,7 @@ namespace GoogleQueryReader.Models
         public string BranchDeeplinkUrlId { get; set; }
 
         [JsonProperty("og:updated_time")]
-        public DateTime? OgUpdatedTime { get; set; }
+        public string? OgUpdatedTime { get; set; }
 
         [JsonProperty("twitter:label1")]
         public string TwitterLabel1 { get; set; }
@@ -278,7 +278,7 @@ namespace GoogleQueryReader.Models
         public string DctermsPublisher { get; set; }
 
         [JsonProperty("dcterms.available")]
-        public DateTime? DctermsAvailable { get; set; }
+        public string? DctermsAvailable { get; set; }
 
         [JsonProperty("twitter:site:id")]
         public string TwitterSiteId { get; set; }
@@ -293,7 +293,7 @@ namespace GoogleQueryReader.Models
         public string DctermsDescription { get; set; }
 
         [JsonProperty("dcterms.created")]
-        public DateTime? DctermsCreated { get; set; }
+        public string? DctermsCreated { get; set; }
 
         [JsonProperty("twitter:image:src")]
         public string TwitterImageSrc { get; set; }
@@ -356,11 +356,11 @@ namespace GoogleQueryReader.Models
     {
         public string image { get; set; }
         public string articlebody { get; set; }
-        public DateTime datemodified { get; set; }
+        public string datemodified { get; set; }
         public string keywords { get; set; }
         public string name { get; set; }
         public string headline { get; set; }
-        public DateTime datepublished { get; set; }
+        public string datepublished { get; set; }
         public string thumbnailurl { get; set; }
         public string mainentityofpage { get; set; }
         public string articlesection { get; set; }

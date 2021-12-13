@@ -33,23 +33,39 @@ namespace GoogleQueryReader.Controllers
         }
 
 
-        [HttpGet]
-        public List<NewsFeedModel> SearchNews(string searchQuery)
+        //[HttpGet]
+        //public List<NewsFeedModel> SearchNews(string searchQuery)
+        //{
+        //    //  List<string> placeHolders = DataStore.PlaceHolders.Select(g => g.DirtKeyword).ToList();
+        //    List<NewsFeedModel> Details = new List<NewsFeedModel>();
+        //    foreach (var ph in DataStore.PlaceHolders)
+        //    {
+        //        ph.SearchQuery = searchQuery;
+        //        var data = GetCompanyNewsDetrarils(ph).Result;
+        //        Details.AddRange(data);
+        //    }
+
+        //    return Details;
+        //}
+
+        [HttpPost]
+        public List<NewsFeedModel> SearchNews(SearchModel model)
         {
             //  List<string> placeHolders = DataStore.PlaceHolders.Select(g => g.DirtKeyword).ToList();
             List<NewsFeedModel> Details = new List<NewsFeedModel>();
-            foreach (var ph in DataStore.PlaceHolders)
+            foreach (var ph in model.Keywords)
             {
-                ph.SearchQuery = searchQuery;
-                var data = GetCompanyNewsDetrarils(ph).Result;
+                model.DirtKeyword = ph;
+                var data = GetCompanyNewsDetrarils(model).Result;
                 Details.AddRange(data);
             }
 
             return Details;
         }
 
+
         [HttpPost("ExportPDF")]
-        public FileResult ExportPDF(List<NewsFeedModel> model,string searchkey)
+        public FileResult ExportPDF(List<NewsFeedModel> model, string searchkey)
         {
             DataTable dt = model.ToDataTable<NewsFeedModel>();
 
@@ -57,7 +73,7 @@ namespace GoogleQueryReader.Controllers
             {
                 int pdfRowIndex = 1;
 
-                string filename = searchkey.Replace(" ","") + DateTime.Now.ToString("dd-MM-yyyy hh_mm_s_tt");
+                string filename = searchkey.Replace(" ", "") + DateTime.Now.ToString("dd-MM-yyyy hh_mm_s_tt");
                 string filepath = Path.Combine(_webHostEnvironment.ContentRootPath, filename + ".pdf");
                 Document document = new Document(PageSize.A4, 5f, 5f, 10f, 10f);
                 FileStream fs = new FileStream(filepath, FileMode.Create);
@@ -117,7 +133,7 @@ namespace GoogleQueryReader.Controllers
                 //{
                 //    Content = new ByteArrayContent(bytes)
                 //};
-        
+
                 //result.Content.Headers.ContentDisposition =
                 //    new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
                 //    {
@@ -134,41 +150,50 @@ namespace GoogleQueryReader.Controllers
         private async Task<List<NewsFeedModel>> GetCompanyNewsDetrarils(SearchModel model)
         {
             List<NewsFeedModel> Details = new List<NewsFeedModel>();
-            for (int i = 1; i <= 2; i++)
+            int pagecount = 1;
+            if (model.ResultCount > 10)
+            {
+                pagecount = (model.ResultCount) / 10;
+            }
+            for (int i = 1; i <= pagecount; i++)
             {
                 string url = getAPIUrl(model, i);
                 HttpClient client = new HttpClient();
                 HttpResponseMessage response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
                 string responseBody = await response.Content.ReadAsStringAsync();
-                Details.AddRange(Newtonsoft.Json.JsonConvert.DeserializeObject<GoogleResponseModel>(responseBody).items.Select(g => new NewsFeedModel() { Title = g.title, Link = g.link, Description = string.Join(".", g.pagemap.metatags.Select(g => g.OgDescription)), PubDate = g.snippet.Substring(0, 11).ToDate()}));
+                Details.AddRange(Newtonsoft.Json.JsonConvert.DeserializeObject<GoogleResponseModel>(responseBody).items?.Select(g => new NewsFeedModel()
+                {
+                    Title = g.title,
+                    Link = g.link,
+                    Description = string.Join(".", g.pagemap.metatags != null && g.pagemap.metatags.Count > 0 ? g.pagemap.metatags.Select(g => g.OgDescription) : new List<string>()),
+                    PubDate = !string.IsNullOrEmpty(g.snippet) ? g.snippet.Substring(0, 12).ToDate() : string.Empty
+                }));
             }
-            if (model.SortMode=="a")
-            {
-                Details = Details.OrderBy(g => g.PubDate).ToList();
-            }
-            else if(model.SortMode == "d")
-            {
-                Details = Details.OrderByDescending(g => g.PubDate).ToList();
-            }
-            return Details.Where(s => s.PubDate > DateTime.Now.AddDays(model.DaysRestricted * (-1)) || s.PubDate.Date==DateTime.MinValue.Date).ToList();
+
+            return Details;//Where(s => s.PubDate > DateTime.Now.AddDays(model.DaysRestricted * (-1)) || s.PubDate.Date == DateTime.MinValue.Date).ToList()
         }
 
         private string getAPIUrl(SearchModel model, int start)
         {
 
-            string url = "https://customsearch.googleapis.com/customsearch/v1?q=" + model.SearchQuery + "&start=" + start+"&key="+configuration.GetSection("ge_appid").Value+"&cx=" + configuration.GetSection("ge_cx").Value;
+            string url = "https://customsearch.googleapis.com/customsearch/v1?q=" + model.SearchQuery + "&start=" + start + "&key=" + configuration.GetSection("ge_appid").Value + "&cx=" + configuration.GetSection("ge_cx").Value;
             if (model.ResultCount != 0)
             {
-                url += "&num=" + model.ResultCount;
+                url += "&num=10";
             }
-            if (model.CountryCode != null)
+            if (!string.IsNullOrEmpty(model.CountryCode))
             {
                 url += "&gl=" + model.CountryCode;
             }
-            if (model.SortMode != null)
+            if (!string.IsNullOrEmpty(model.SortMode))
             {
-                //url += " &sort=date-sdate:" + model.SortMode;
+                url += " &sort=date:" + model.SortMode;
+
+            }
+            if (model.DaysRestricted!=0)
+            {
+                url += " &dateRestrict=d" + model.DaysRestricted;
 
             }
             //start = 10&num=10 &

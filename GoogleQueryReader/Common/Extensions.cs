@@ -10,15 +10,20 @@ namespace GoogleQueryReader.Common
 {
     public static class Extensions
     {
-        public static DateTime ToDate(this string datestr)
+        public static string ToDate(this string datestr)
         {
             try
             {
-                return DateTime.Parse(datestr);
+                 DateTime.Parse(datestr);
+                return datestr;
             }
             catch (Exception)
             {
-                return DateTime.MinValue;
+                if(datestr.Contains("day") || datestr.Contains("hour"))
+                {
+                    return datestr;
+                }
+                return "Not valid date";
             }
         }
         public static DataTable ToDataTable<T>(this List<T> items)

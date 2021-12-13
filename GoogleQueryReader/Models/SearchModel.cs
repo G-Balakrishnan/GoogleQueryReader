@@ -8,9 +8,10 @@ namespace GoogleQueryReader.Models
 {
     public class SearchModel
     {
-  
-        public string DirtKeyword { get; set; }
         [JsonIgnore]
+        public string DirtKeyword { get; set; }
+        public List<string> Keywords { get; set; }
+        //[JsonIgnore]
         public string SearchQuery { get; set; }
         public string CountryCode { get; set; }
         public int ResultCount { get; set; } = 10;
