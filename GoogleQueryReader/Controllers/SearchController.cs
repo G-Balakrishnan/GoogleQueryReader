@@ -176,8 +176,8 @@ namespace GoogleQueryReader.Controllers
 
         private string getAPIUrl(SearchModel model, int start)
         {
-
-            string url = "https://customsearch.googleapis.com/customsearch/v1?q=" + model.SearchQuery + "&start=" + start + "&key=" + configuration.GetSection("ge_appid").Value + "&cx=" + configuration.GetSection("ge_cx").Value;
+            // // "https://customsearch.googleapis.com/customsearch/v1?q="
+            string url =configuration.GetSection("baseurl").Value+ model.SearchQuery + "&start=" + start + "&key=" + configuration.GetSection("ge_appid").Value + "&cx=" + configuration.GetSection("ge_cx").Value;
             if (model.ResultCount != 0)
             {
                 url += "&num=10";
